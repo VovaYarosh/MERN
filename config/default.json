@@ -1,4 +1,6 @@
 {
   "mongoURI": "mongodb+srv://vova123:123456789qwerty@cluster0.lj7qk.mongodb.net/MERNdb?retryWrites=true&w=majority",
-  "jwtSecret": "mysecrettoken"
+  "jwtSecret": "mysecrettoken",
+  "githubClientId": "id",
+  "githubSecret": "secretkey"
 }
