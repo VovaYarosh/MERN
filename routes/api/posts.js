@@ -10,7 +10,7 @@ const User = require('../../models/User');
 // @route   POST api/posts
 // @desc    Create a post
 // @access  Private
-router.post('/',[
+router.post('/', [
     auth, [
         check('text', 'Text is required')
             .not()
@@ -18,8 +18,8 @@ router.post('/',[
     ]
 ], async (req, res) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        return res.status(400).json({ errors: errors.array()})
+    if (!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array()})
     }
 
     try {
@@ -35,7 +35,7 @@ router.post('/',[
         const post = await newPost.save();
 
         res.json(post);
-    }catch (err) {
+    } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
@@ -46,9 +46,9 @@ router.post('/',[
 // @access  Private
 router.get('/', auth, async (req, res) => {
     try {
-       const posts = await  Post.find().sort({ date: -1});
-       res.json(posts)
-    }catch(err){
+        const posts = await  Post.find().sort({date: -1});
+        res.json(posts)
+    } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
@@ -60,14 +60,14 @@ router.get('/', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
     try {
         const post = await  Post.findById(req.params.id);
-        if(!post){
+        if (!post) {
             return res.status(404).json({msg: 'Post not found'});
         }
 
         res.json(post)
-    }catch(err){
+    } catch (err) {
         console.error(err.message);
-        if(err.kind === 'ObjectId'){
+        if (err.kind === 'ObjectId') {
             return res.status(404).json({msg: 'Post not found'});
         }
         res.status(500).send('Server Error');
@@ -81,24 +81,71 @@ router.delete('/:id', auth, async (req, res) => {
     try {
         const post = await  Post.findById(req.params.id);
 
-        if(!post){
+        if (!post) {
             return res.status(404).json({msg: 'Post not found'});
         }
 
         //check user
-        if(post.user.toString() !== req.user.id){
+        if (post.user.toString() !== req.user.id) {
             return res.status(401).json({
-               msg: 'USer not authorized'
+                msg: 'USer not authorized'
             })
         }
 
         await post.remove();
 
         res.json({msg: 'post removed'})
-    }catch(err){
+    } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
-})
+});
 
-module.exports = router
+// @route   Put api/post/like/:id
+// @desc    Like a post
+// @access  Private
+router.put('/like/:id', auth, async (req, res) => {
+    try {
+        const post = await  Post.findById(req.params.id);
+
+        //Check if the post has already been liked
+        if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+            return res.status(400).json({msg: 'Post already been liked'});
+        }
+        post.likes.unshift({user: req.user.id});
+
+        await post.save();
+        res.json(post.likes);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   Put api/post/unlike/:id
+// @desc    Unlike a post
+// @access  Private
+router.put('/unlike/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        //Check if the post has already been liked
+        if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
+            return res.status(400).json({msg: 'Post has not yet been liked'});
+        }
+        post.likes.unshift({user: req.user.id});
+
+        //Get remove index
+        const removeIdx = post.likes.map(like => like.user.toString()).indexOf(req.user.id);
+
+        post.likes.splice(removeIdx, 1);
+
+        await post.save();
+        res.json(post.likes);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+module.exports = router;
