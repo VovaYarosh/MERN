@@ -1,4 +1,5 @@
 import React, {Fragment,useState} from 'react'
+import { Link } from 'react-router-dom'
 
 const  Register = () => {
     const [formData, setFormData] = useState({
@@ -14,12 +15,12 @@ const  Register = () => {
         ...formData, [e.target.name]: e.target.value
     });
 
-    const onSubmit = e => {
+    const onSubmit = async e => {
         e.preventDefault();
         if(password !== password2){
             console.log('Passwords do not match');
         }else {
-            console.log(formData)
+           console.log('success');
         }
     }
 
@@ -45,7 +46,7 @@ const  Register = () => {
                         name="email"
                         value={email}
                         onChange={e => onChange(e)}
-                        required={}
+                        required
                     />
                     <small className="form-text"
                     >This site uses Gravatar so if you want a profile image, use a
@@ -76,7 +77,7 @@ const  Register = () => {
                 <input type="submit" className="btn btn-primary" value="Register"/>
             </form>
             <p className="my-1">
-                Already have an account? <a href="login.html">Sign In</a>
+                Already have an account? <Link to="/login">Sign In</Link>
             </p>
         </Fragment>
     )

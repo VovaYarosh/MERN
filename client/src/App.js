@@ -7,17 +7,19 @@ import Register from './components/auth/Register'
 import './App.css';
 
 const App = () => (
-    <Fragment>
-        <Navbar/>
-        <Route exact path='/' component={Landing}/>
-        <section className="container">
-            <Switch>
-                <Route exact path="/register" component={Register}/>
-                <Route exact path="/login" component={Login}/>
-            </Switch>
-        </section>
-        <Landing/>
-    </Fragment>
+    <Router>
+        <Fragment>
+            <Navbar/>
+            <Route exact path='/' component={Landing}/>
+            <section className="container">
+                <Switch>
+                    <Route exact path="/register" component={Register}/>
+                    <Route exact path="/login" component={Login}/>
+                </Switch>
+            </section>
+            <Landing/>
+        </Fragment>
+    </Router>
 );
 
 export default App;
